@@ -4,16 +4,17 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { StatusCodes } = require('http-status-codes')
 const PORT = process.env.PORT
+const connectDb = require('./db/connect')
 
 // instance
 const app = express()
 
 // body parser
-app.use(express.urlencoded({ extended: false }))
-app.use(express.json)
+app.use(express.urlencoded({ extended: false })) // query format of data
+app.use(express.json()) // json format of data 
 
 // middleware
-app.use(cors())
+app.use(cors()) // cross origin resource sharing
 app.use(cookieParser())
 
 // api route
@@ -26,9 +27,9 @@ app.use(`**`, (req,res) => {
 
 // server listen
 app.listen(PORT,() => {
+   connectDb()
    console.log(`server is started and running @ http://localhost:${PORT}`)
 })
-
 
 
 /* 
