@@ -2,6 +2,8 @@ const { StatusCodes } = require("http-status-codes")
 const bcrypt = require('bcryptjs')
 const User = require('../model/userModel')
 const comparePassword = require('../util/password')
+const createAccessToken = require('../util/token')
+const jwt = require('jsonwebtoken')
 
 const authController = {
     register: async (req,res) => {
@@ -50,12 +52,43 @@ const authController = {
                 if(!isMatch) 
                    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Passwords are not matched` })
 
-                res.status(StatusCodes.OK).json({ msg: `Login success(email)` })
+                // generate access token
+                let authToken = createAccessToken({ id: extEmail._id })
+
+                // set the token in cookies
+                res.cookie('loginToken', authToken, {
+                    httpOnly: true,
+                    signed: true,
+                    path: `/api/auth/token`,
+                    maxAge: 1 * 24 * 60 * 60 * 1000
+                })
+
+                res.status(StatusCodes.OK).json({ msg: `Login success(email)`, authToken })
             }
 
             // if login through mobile
             if(mobile) {
+                let extMobile = await User.findOne({ mobile })
+                if(!extMobile)
+                   return res.status(StatusCodes.CONFLICT).json({ msg: `${mobile} number doesn't exists.` })
 
+                // compare the password
+                let isMatch = await comparePassword(password,extMobile.password)
+                if(!isMatch) 
+                   return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Passwords are not matched` })
+
+                // generate access token
+                let authToken = createAccessToken({ id: extMobile._id })
+
+                // set the token in cookies
+                res.cookie('loginToken', authToken, {
+                    httpOnly: true,
+                    signed: true,
+                    path: `/api/auth/token`,
+                    maxAge: 1 * 24 * 60 * 60 * 1000
+                })
+
+                res.status(StatusCodes.OK).json({ msg: `Login success(mobile)`, authToken })
             }
 
         } catch(err) {
@@ -64,14 +97,30 @@ const authController = {
     },
     logout: async (req,res) => {
         try {
-            res.json({ msg: `logout` })
+            // clear cookies
+            res.clearCookie('loginToken', { path: `/api/auth/token` })
+
+            res.status(StatusCodes.OK).json({ msg: `logout successfully` })
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message })
         }
     },
     authToken: async (req,res) => {
         try {
-            res.json({ msg: `auth token` })
+            // read the login token from signed cookies
+            const rToken = req.signedCookies.loginToken
+
+            if(!rToken)
+               return res.status(StatusCodes.NOT_FOUND).json({ msg: `token not available` })
+
+            // valid user id or not
+            await jwt.verify(rToken, process.env.ACCESS_SECRET, (err,user) => {
+                if(err)
+                   return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `UnAuthorized... login again` })
+
+                // if valid token
+                res.status(StatusCodes.OK).json({ authToken: rToken })
+            })
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message })
         }
@@ -85,4 +134,4 @@ const authController = {
     },
 }
 
-module.exports = authController
+module.exports = authController 
