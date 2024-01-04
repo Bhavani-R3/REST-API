@@ -127,11 +127,36 @@ const authController = {
     },
     currentUser: async (req,res) => {
         try {
-            res.json({ msg: `current user` })
+            let single = await User.findById({ _id: req.userId }).select('-password')
+                if(!single) 
+                   return res.status(StatusCodes.NOT_FOUND).json({ msg: `user info not found`})
+
+            res.status(StatusCodes.ACCEPTED).json({ user: single })
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message })
         }
     },
+    verifyUser: async (req, res) => {
+        try {
+            res.json({ msg: `verify user`})
+        } catch(err) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err })
+        }
+    },
+    passwordLink: async (req, res) => {
+        try {
+            res.json({ msg: `generate password link`})
+        } catch(err) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err })
+        }
+    },
+    updatePassword: async (req, res) => {
+        try {
+            res.json({ msg: `update password`})
+        } catch(err) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err })
+        }
+    }
 }
 
 module.exports = authController 
