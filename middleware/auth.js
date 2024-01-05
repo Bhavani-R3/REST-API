@@ -13,7 +13,7 @@ const auth = async (req,res,next) => {
                // verifying token
                await jwt.verify(token, process.env.ACCESS_SECRET, (err,data) => {
                 if(err)
-                return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Unauthorized token, login again`})
+                return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Unauthorized token`})
 
                 // res.json({data}) // id 
                 // store id in req. variable
