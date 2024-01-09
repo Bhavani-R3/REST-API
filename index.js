@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const { StatusCodes } = require('http-status-codes')
 const PORT = process.env.PORT
 const connectDb = require('./db/connect')
+const expressFileupload = require('express-fileupload')
 
 // instance
 const app = express()
@@ -16,9 +17,14 @@ app.use(express.json()) // json format of data
 // middleware
 app.use(cors()) // cross origin resource sharing
 app.use(cookieParser(process.env.ACCESS_SECRET))
+app.use(expressFileupload({
+   limits: { fileSize: 10 * 1024 * 1024 },
+   useTempFiles: true
+}))
 
 // api route
 app.use(`/api/auth`, require('./route/authRoute'))
+app.use(`/api/file`, require('./route/fileRoute'))  
 
 // default route
 app.use(`**`, (req,res) => {
