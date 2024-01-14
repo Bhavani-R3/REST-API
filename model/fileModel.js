@@ -1,6 +1,22 @@
 const mongoose = require('mongoose')
 
 const fileSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    newName: {
+        type: String,
+        required: true,
+        trim: true,
+        unique: true
+    },
+    extName: {
+        type: String,
+        require: true,
+        trim: true
+    },
     user: {
         type: Object,
         require: true

@@ -10,7 +10,7 @@ const mailConfig = require('../util/mail.config')
 const authController = {
     register: async (req,res) => {
         try {
-            const { name, email, mobile, password } = req.body
+            const { name, email, mobile, password, role } = req.body
 
             // email
             const extEmail = await User.findOne({ email })
@@ -31,6 +31,7 @@ const authController = {
                 name,
                 email,
                 mobile,
+                role,
                 password: encPass        
             })
 
