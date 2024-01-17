@@ -32,7 +32,7 @@ app.use(`/api/user`, require('./route/userRoute'))
 
 // default route
 app.use(`**`, (req,res) => {
-   res.status(StatusCodes.SERVICE_UNAVAILABLE).json({ msg: `Requested service path not available` })
+   res.status(StatusCodes.SERVICE_UNAVAILABLE).json({ msg: `Requested service path not available`, success: false })
 })
 
 // server listen

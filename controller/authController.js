@@ -18,10 +18,10 @@ const authController = {
 
             // point the duplicate, any server response error 409
             if(extEmail) 
-                return res.status(StatusCodes.CONFLICT).json({ msg: `${email} already exists` })
+                return res.status(StatusCodes.CONFLICT).json({ msg: `${email} already exists`, success: false })
             
             if(extMobile) 
-                return res.status(StatusCodes.CONFLICT).json({ msg: `${mobile} already exists` })
+                return res.status(StatusCodes.CONFLICT).json({ msg: `${mobile} already exists`, success: false })
 
             // encrypt the password into hash
             const encPass = await bcrypt.hash(password,10);
@@ -35,7 +35,7 @@ const authController = {
                 password: encPass        
             })
 
-            res.status(StatusCodes.ACCEPTED).json({ msg: "New user registered successfully", user:data })
+            res.status(StatusCodes.ACCEPTED).json({ msg: "New user registered successfully", user:data, success: true })
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message })
         }
@@ -53,7 +53,7 @@ const authController = {
                 // compare the password(string,hash)
                 let isMatch = await comparePassword(password,extEmail.password)
                 if(!isMatch) 
-                   return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Passwords are not matched` })
+                   return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Passwords are not matched`, success: false })
 
                 // generate access token
                 let authToken = createAccessToken({ id: extEmail._id })
@@ -78,7 +78,7 @@ const authController = {
                 // compare the password
                 let isMatch = await comparePassword(password,extMobile.password)
                 if(!isMatch) 
-                   return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Passwords are not matched` })
+                   return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Passwords are not matched`, success: false })
 
                 // generate access token
                 let authToken = createAccessToken({ id: extMobile._id })
@@ -95,7 +95,7 @@ const authController = {
             }
 
         } catch(err) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message })
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message, success: false })
         }
     },
     logout: async (req,res) => {
@@ -105,7 +105,7 @@ const authController = {
 
             res.status(StatusCodes.OK).json({ msg: `logout successfully` })
         } catch(err) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message })
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message, success: false })
         }
     },
     authToken: async (req,res) => {
@@ -172,9 +172,9 @@ const authController = {
                // send email
                let emailRes = await mailConfig(email,subject,passTemplate)
 
-            res.status(StatusCodes.ACCEPTED).json({ msg: `password link successfully sent.`, status: emailRes})
+            res.status(StatusCodes.ACCEPTED).json({ msg: `password link successfully sent.`, status: emailRes, success: true})
         } catch(err) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err })
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err, success: false })
         }
     },
     updatePassword: async (req, res) => {
@@ -184,7 +184,7 @@ const authController = {
 
             let extUser = await User.findById({ _id: id })
                 if(!extUser) 
-                   return res.status(StatusCodes.CONFLICT).json({ msg: `Requested user info not exists.` })
+                   return res.status(StatusCodes.CONFLICT).json({ msg: `Requested user info not exists.`, success: false })
                 
                    // encrypt the password into hash
                 const encPass = await bcrypt.hash(password,10);
@@ -192,9 +192,9 @@ const authController = {
                 // update the password
                 await User.findByIdAndUpdate({ _id: id }, { password: encPass })
 
-                return res.status(StatusCodes.ACCEPTED).json({  msg: `Password successfully updated` })
+                return res.status(StatusCodes.ACCEPTED).json({  msg: `Password successfully updated`, success: true })
         } catch(err) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err })
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err, success: false })
         }
     }
 }
