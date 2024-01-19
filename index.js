@@ -3,7 +3,7 @@ require('dotenv').config()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { StatusCodes } = require('http-status-codes')
-const PORT = process.env.PORT
+const PORT = Number(process.env.PORT)
 const connectDb = require('./db/connect')
 const expressFileupload = require('express-fileupload')
 
