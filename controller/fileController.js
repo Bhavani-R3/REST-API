@@ -95,8 +95,8 @@ const readSingle = async (req,res) => {
             if(!extFile)
                return res.status(StatusCodes.CONFLICT).json({ msg: `Requested file id not exists`, success: false })
 
-        // if file belongs to authorized user or not
-           if(userId !== extFile.userId)
+            // if file belongs to authorized user or not
+            if(userId !== extFile.userId)
               return res.status(StatusCodes.UNAUTHORIZED).json({ msg: `Unauthorized file read..`, success: false })
 
         res.status(StatusCodes.ACCEPTED).json({ file: extFile, success: true })
