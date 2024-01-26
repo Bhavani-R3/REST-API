@@ -20,7 +20,7 @@ const uploadFile = async (req,res) => {
 
         const id = req.userId 
 
-        // check the folder if folder not exists create it
+        // check the public folder if folder not exists create it
         const outPath = path.join(__dirname, '../public')
         if(!fs.existsSync(outPath)) {
             fs.mkdirSync(outPath, { recursive: true })
@@ -50,8 +50,8 @@ const uploadFile = async (req,res) => {
             // store the file in physical location
             await product.mv(path.resolve(__dirname, `../public/${filename}`), async (err) => {
                 if(err) {
-                    removeTemp(req.files.product.tempFilePath)
-                    return res.status(StatusCodes.CONFLICT).json({ msg: err })
+                    removeTemp(product.tempFilePath)
+                    return res.status(StatusCodes.CONFLICT).json({ msg: err, success: false })
                 }
                     // add file info to db collection
                 let fileRes = await FileSchema.create(
@@ -61,7 +61,7 @@ const uploadFile = async (req,res) => {
                       user: extUser,
                       info: product })
                 
-                    // final response
+                // final response
                 res.status(StatusCodes.ACCEPTED).json({ msg: "File uploaded successfully", file: fileRes, success: true })
             })
         } else {
@@ -79,7 +79,7 @@ const readAll = async (req,res) => {
     try {
         let files = await FileSchema.find({})
         let filtered = files.filter((item) => item.userId === req.userId)
-        res.status(StatusCodes.OK).json({ length: files.length, files: filtered, success: true })
+        res.status(StatusCodes.OK).json({ length: filtered.length, files: filtered, success: true })
     } catch (err) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err, success: false })
     }
@@ -91,6 +91,7 @@ const readSingle = async (req,res) => {
         let fileId = req.params.id
         let userId = req.userId
 
+        // read existing file data ref to id
         let extFile = await FileSchema.findById({ _id: fileId })
             if(!extFile)
                return res.status(StatusCodes.CONFLICT).json({ msg: `Requested file id not exists`, success: false })

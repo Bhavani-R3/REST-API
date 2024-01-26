@@ -12,7 +12,7 @@ const authController = {
         try {
             const { name, email, mobile, password, role } = req.body
 
-            // email
+            // email and mobile validate to avoid duplicates
             const extEmail = await User.findOne({ email })
             const extMobile = await User.findOne({ mobile })
 
@@ -93,7 +93,6 @@ const authController = {
 
                 res.status(StatusCodes.OK).json({ msg: `Login success(mobile)`, authToken, success: true })
             }
-
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message, success: false })
         }
@@ -142,7 +141,7 @@ const authController = {
     verifyUser: async (req, res) => {
         try {
             let {email} = req.body
-                // read 
+                // read  the user info through email
             let extEmail = await User.findOne({ email })
                 if(!extEmail)
                    return res.status(StatusCodes.CONFLICT).json({ msg: `${email} doesn't exists`, status: false })
@@ -155,22 +154,21 @@ const authController = {
     passwordLink: async (req, res) => {
         try {
             let {email} = req.body
-
             let extEmail = await User.findOne({ email })
             if(!extEmail)
                return res.status(StatusCodes.CONFLICT).json({ msg: `${email} doesn't exists`, status: false })
 
-               // password token
-               let passToken = createAccessToken({id: extEmail._id})
+            // password token
+            let passToken = createAccessToken({id: extEmail._id})
 
-               // password reset template
-               let passTemplate = reset_password(extEmail.name, email, passToken )
+            // password reset template
+            let passTemplate = reset_password(extEmail.name, email, passToken )
 
-               // email subject
-               let subject = `Reset Your Password`
+            // email subject
+            let subject = `Reset Your Password`
 
-               // send email
-               let emailRes = await mailConfig(email,subject,passTemplate)
+            // send email
+            let emailRes = await mailConfig(email,subject,passTemplate)
 
             res.status(StatusCodes.ACCEPTED).json({ msg: `password link successfully sent.`, status: emailRes, success: true})
         } catch(err) {
@@ -186,13 +184,13 @@ const authController = {
                 if(!extUser) 
                    return res.status(StatusCodes.CONFLICT).json({ msg: `Requested user info not exists.`, success: false })
                 
-                   // encrypt the password into hash
-                const encPass = await bcrypt.hash(password,10);
+            // encrypt the password into hash
+            const encPass = await bcrypt.hash(password,10);
 
-                // update the password
-                await User.findByIdAndUpdate({ _id: id }, { password: encPass })
+            // update the password
+            await User.findByIdAndUpdate({ _id: id }, { password: encPass })
 
-                return res.status(StatusCodes.ACCEPTED).json({  msg: `Password successfully updated`, success: true })
+            return res.status(StatusCodes.ACCEPTED).json({  msg: `Password successfully updated`, success: true })
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err, success: false })
         }
