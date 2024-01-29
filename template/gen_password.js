@@ -6,7 +6,7 @@ const reset_password = (name, email, token) => {
                          <h3>Follow this link to reset your password.. </h3>
                          <p>
                            <strong>
-                                  <a class="btn" href="/password/reset?token=${token}">
+                                  <a class="btn" href="${process.env.FRONTEND_URL}/password/reset?token=${token}">
                                      Reset Password
                                   </a>
                            </strong>
