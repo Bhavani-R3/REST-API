@@ -26,6 +26,15 @@ app.use(expressFileupload({
    useTempFiles: true
 }))
 
+// production controller
+if(process.env.SERVER === "production") {
+   // executes in production mode
+   app.use(`/`, (req,res,next) => {
+      return res.sendFile(path.resolve(__dirname, `./build/index.html`))
+      next()
+   })
+}
+
 // api route
 app.use(`/api/auth`, require('./route/authRoute'))
 app.use(`/api/file`, require('./route/fileRoute'))  
@@ -35,15 +44,6 @@ app.use(`/api/user`, require('./route/userRoute'))
 app.use(`**`, (req,res) => {
    res.status(StatusCodes.SERVICE_UNAVAILABLE).json({ msg: `Requested service path not available`, success: false })
 })
-
-// production controller
-if(process.env.SERVER === "production") {
-   // executes in production mode
-   app.use(`/`, (req,res,next) => {
-      return res.sendFile(path.resolve(__dirname, `./build/index.html`))
-      next()
-   })
-}
 
 // server listen
 app.listen(PORT,() => {
