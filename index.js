@@ -16,6 +16,7 @@ app.use(express.json()) // json format of data
 
 // public dir as static
 app.use(express.static("public"))
+app.use(express.static("build"))
 
 // middleware
 app.use(cors()) // cross origin resource sharing
@@ -34,6 +35,15 @@ app.use(`/api/user`, require('./route/userRoute'))
 app.use(`**`, (req,res) => {
    res.status(StatusCodes.SERVICE_UNAVAILABLE).json({ msg: `Requested service path not available`, success: false })
 })
+
+// production controller
+if(process.env.SERVER === "production") {
+   // executes in production mode
+   app.use(`/`, (req,res,next) => {
+      return res.sendFile(path.resolve(__dirname, `./build/index.html`))
+      next()
+   })
+}
 
 // server listen
 app.listen(PORT,() => {
