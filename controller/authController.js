@@ -155,9 +155,9 @@ const authController = {
                 // read  the user info through email
             let extEmail = await User.findOne({ email })
                 if(!extEmail)
-                   return res.status(StatusCodes.CONFLICT).json({ msg: `${email} doesn't exists`, status: false })
+                   return res.status(StatusCodes.CONFLICT).json({ msg: `${email} doesn't exists`, success: false })
 
-            res.status(StatusCodes.ACCEPTED).json({ msg: 'Email id verified successfully', status: true})
+            res.status(StatusCodes.ACCEPTED).json({ msg: 'Email id verified successfully', success: true})
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err, success: false })
         }
