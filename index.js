@@ -28,13 +28,13 @@ app.use(expressFileupload({
 }))
 
 // production controller
-if(process.env.SERVER === "production") {
-   // executes in production mode
-   app.use(`/`, (req,res,next) => {
-      return res.sendFile(path.join(__dirname, `./build/index.html`))
-      next()
-   })
-}
+// if(process.env.SERVER === "production") {
+//    // executes in production mode
+//    app.use(`/`, (req,res,next) => {
+//       return res.sendFile(path.join(__dirname, `./build/index.html`))
+//       next()
+//    })
+// }
 
 // api route
 app.use(`/api/auth`, require('./route/authRoute'))
