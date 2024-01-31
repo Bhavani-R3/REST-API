@@ -14,12 +14,12 @@ const fileSchema = new mongoose.Schema({
     },
     extName: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     user: {
         type: Object,
-        require: true
+        required: true
     },
     info: {
         type: Object,

@@ -6,6 +6,7 @@ const createAccessToken = require('../util/token')
 const jwt = require('jsonwebtoken')
 const reset_password = require('../template/gen_password')
 const mailConfig = require('../util/mail.config')
+const confirm_temp = require('../template/confirm')
 
 const authController = {
     register: async (req,res) => {
@@ -35,7 +36,17 @@ const authController = {
                 password: encPass        
             })
 
-            res.status(StatusCodes.ACCEPTED).json({ msg: "New user registered successfully", user:data, success: true })
+            // email subject
+            let subject = `Registration Confirmation`
+            let msg = "You have Successfully Registered.."
+
+            // register confirm template
+            let confirm_template = confirm_temp(name, email, subject, msg)
+
+            // send email
+            let emailRes = await mailConfig(email,subject,confirm_template)
+
+            res.status(StatusCodes.ACCEPTED).json({ msg: "New user registered successfully", user:data, success: true, emailRes })
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err.message, success: false })
         }
@@ -190,7 +201,17 @@ const authController = {
             // update the password
             await User.findByIdAndUpdate({ _id: id }, { password: encPass })
 
-            return res.status(StatusCodes.ACCEPTED).json({  msg: `Password successfully updated`, success: true })
+            // email subject
+            let subject = `Password Update`
+            let msg = `You have Successfully Updated the Password. Your new password is = ${password}`;
+ 
+            // register confirm template
+            let confirm_template = confirm_temp(extUser.name, extUser.email, subject, msg)
+ 
+            // send email
+            let emailRes = await mailConfig(extUser.email,subject,confirm_template)
+
+            return res.status(StatusCodes.ACCEPTED).json({  msg: `Password successfully updated`, success: true, emailRes })
         } catch(err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err, success: false })
         }

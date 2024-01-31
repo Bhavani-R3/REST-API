@@ -3,9 +3,10 @@ require('dotenv').config()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { StatusCodes } = require('http-status-codes')
-const PORT = Number(process.env.PORT)
+const PORT = process.env.PORT
 const connectDb = require('./db/connect')
 const expressFileupload = require('express-fileupload')
+const path = require('path')
 
 // instance
 const app = express()
@@ -30,7 +31,7 @@ app.use(expressFileupload({
 if(process.env.SERVER === "production") {
    // executes in production mode
    app.use(`/`, (req,res,next) => {
-      return res.sendFile(path.resolve(__dirname, `./build/index.html`))
+      return res.sendFile(path.join(__dirname, `./build/index.html`))
       next()
    })
 }

@@ -81,7 +81,7 @@ const readAll = async (req,res) => {
         let filtered = files.filter((item) => item.userId === req.userId)
         res.status(StatusCodes.OK).json({ length: filtered.length, files: filtered, success: true })
     } catch (err) {
-        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err, success: false })
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err })
     }
 }
 
