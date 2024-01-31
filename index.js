@@ -17,7 +17,7 @@ app.use(express.json()) // json format of data
 
 // public dir as static
 app.use(express.static("public"))
-app.use(express.static("build"))
+// app.use(express.static("build"))
 
 // middleware
 app.use(cors()) // cross origin resource sharing
